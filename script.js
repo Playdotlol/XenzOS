@@ -1,10 +1,13 @@
 // Simple Login
 const credentials = { username: "admin", password: "1234" };
+
 function login() {
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
   if (u === credentials.username && p === credentials.password) {
+    // Hide the login screen and show the desktop UI
     document.getElementById("login-screen").style.display = "none";
+    document.getElementById("desktop").style.display = "block";
   } else {
     document.getElementById("login-error").classList.remove("hidden");
   }
