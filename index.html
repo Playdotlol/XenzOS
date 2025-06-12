@@ -6,43 +6,23 @@
   <title>XenzOS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .bg-gradient {
-      background: linear-gradient(135deg, #00d2ff, #3a7bd5);
-    }
-    .shadow-lg-custom {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    }
-    .glow {
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
-    }
-    .dock {
-      position: absolute;
-      bottom: 0;
-      width: 100%;
-      background-color: #1e1e1e;
-      display: flex;
-      justify-content: center;
-      padding: 10px 0;
-      box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
-    }
-    .dock button {
-      margin: 0 15px;
-      background: transparent;
-      border: none;
-      color: white;
-      cursor: pointer;
-    }
-    .dock button:hover {
-      transform: scale(1.1);
-    }
-    .dock .active {
-      color: #4caf50;
-    }
+    body { margin: 0; }
+    .bg-gradient { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
+    .shadow-lg-custom { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
+    .glow { text-shadow: 0 0 10px rgba(255,255,255,0.8); }
+    .dock { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(30,30,30,0.8); padding: 5px 10px; border-radius: 16px; display: flex; gap: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+    .dock button { background: transparent; border: none; color: white; cursor: pointer; font-size: 32px; transition: transform .2s; }
+    .dock button:hover { transform: scale(1.2); }
+    #wallpaper { position: absolute; inset:0; background-size: cover; background-position: center; z-index: -1; }
+    .window { background: white; color: black; position: absolute; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
   </style>
 </head>
-<body class="bg-black text-white font-sans h-screen">
+<body class="h-screen overflow-hidden font-sans">
 
-  <!-- Login Screen -->
+  <!-- Wallpaper -->
+  <div id="wallpaper"></div>
+
+  <!-- Login Overlay -->
   <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-gradient z-50">
     <div class="bg-gray-900 p-8 rounded-xl shadow-2xl space-y-6 text-center w-96">
       <h1 class="text-3xl font-bold glow">XenzOS</h1>
@@ -54,15 +34,10 @@
     </div>
   </div>
 
-  <!-- Desktop UI -->
-  <div id="desktop" class="relative w-full h-full overflow-hidden" style="display: none;">
-    <!-- Windows container -->
-    <div id="windows" class="absolute inset-0"></div>
-
-    <!-- Dock -->
-    <div class="dock" id="dock">
-      <!-- Placeholder for Dock Buttons -->
-    </div>
+  <!-- Desktop + Dock -->
+  <div id="desktop" class="relative w-full h-full" style="display:none;">
+    <div id="windows"></div>
+    <div class="dock" id="dock"></div>
   </div>
 
   <script src="script.js"></script>
