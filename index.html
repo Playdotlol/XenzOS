@@ -5,68 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>XenzOS</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet" />
   <style>
     body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'San Francisco', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
     }
-
-    .app-window {
-      @apply absolute top-20 left-1/2 transform -translate-x-1/2 w-2/5 bg-white dark:bg-gray-800 rounded-lg shadow-xl border dark:border-gray-600 overflow-hidden z-30;
-    }
-
-    .app-header {
-      @apply flex justify-between items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-2 font-semibold;
-    }
-
-    .app-content {
-      @apply p-4 text-sm text-gray-800 dark:text-gray-200;
-    }
-
-    .dock-icon:hover {
-      transform: scale(1.2);
-    }
-
     #login-screen {
-      @apply fixed inset-0 bg-gradient-to-br from-gray-900 to-black flex items-center justify-center z-50;
+      @apply fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50;
+    }
+    #login-box {
+      @apply bg-white rounded-xl p-10 shadow-2xl w-80 text-center;
+    }
+    #menuBar {
+      @apply fixed top-0 left-0 right-0 h-8 bg-white bg-opacity-70 backdrop-blur flex justify-between px-4 items-center z-40;
+    }
+    .dark #menuBar {
+      @apply bg-gray-900 bg-opacity-70 text-white;
+    }
+    .app-window {
+      @apply absolute top-20 left-1/2 transform -translate-x-1/2 w-2/5 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-600 overflow-hidden;
+      min-height: 200px;
+    }
+    .app-header {
+      @apply flex justify-between items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-2 font-medium;
+    }
+    .app-content {
+      @apply p-4 text-gray-800 dark:text-gray-200;
+    }
+    #dock {
+      @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-60 backdrop-blur rounded-xl px-4 py-2 flex space-x-6 z-40;
+    }
+    .dock-icon {
+      @apply w-10 cursor-pointer transition-transform;
+    }
+    .dock-icon:hover {
+      @apply scale-125;
     }
   </style>
 </head>
-<body class="h-full bg-cover bg-center bg-no-repeat" style="background-image: url('https://wallpapercave.com/wp/wp4923997.jpg')">
+<body class="h-full bg-cover bg-center" style="background-image: url('https://source.unsplash.com/collection/928423/1920x1080')">
 
   <!-- Login Screen -->
   <div id="login-screen">
-    <div class="bg-white rounded-xl p-10 shadow-2xl text-center w-80">
+    <div id="login-box">
       <h2 class="text-2xl font-bold mb-4">Welcome to XenzOS</h2>
-      <input id="username" type="text" placeholder="Username" class="block w-full mb-3 px-4 py-2 rounded border" />
-      <input id="password" type="password" placeholder="Password" class="block w-full mb-5 px-4 py-2 rounded border" />
-      <button onclick="login()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded">Login</button>
+      <input id="username" type="text" placeholder="Username" class="block w-full px-4 py-2 mb-4 rounded border" />
+      <input id="password" type="password" placeholder="Password" class="block w-full px-4 py-2 mb-6 rounded border" />
+      <button onclick="login()" class="bg-blue-600 text-white py-2 px-4 rounded-lg w-full">Login</button>
       <p id="login-error" class="text-red-500 mt-3 hidden">Invalid credentials</p>
     </div>
   </div>
 
   <!-- Menu Bar -->
-  <div class="fixed top-0 left-0 right-0 h-8 bg-white/80 backdrop-blur text-xs text-gray-800 dark:text-white flex items-center px-4 justify-between z-40">
+  <div id="menuBar" class="hidden">
     <div class="flex space-x-4">
-      <span class="font-bold"></span>
-      <span>Finder</span>
-      <span>File</span>
-      <span>Edit</span>
-      <span>View</span>
+      <span class="font-semibold"> Finder</span>
+      <span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span>
     </div>
-    <div class="text-sm" id="menu-time"></div>
+    <div id="menu-time" class="text-sm"></div>
   </div>
 
-  <!-- App Windows -->
+  <!-- Apps: Finder, Notes, Settings, Browser, Games -->
   <div id="finder" class="app-window hidden">
     <div class="app-header">Finder <button onclick="closeApp('finder')">✕</button></div>
-    <div class="app-content">File system coming soon!</div>
+    <div class="app-content">🗂️ Finder coming soon...</div>
   </div>
 
   <div id="notes" class="app-window hidden">
     <div class="app-header">Notes <button onclick="closeApp('notes')">✕</button></div>
     <div class="app-content">
-      <textarea class="w-full h-40 p-2 rounded border dark:bg-gray-700 dark:border-gray-500"></textarea>
+      <textarea class="w-full h-40 p-2 border rounded dark:bg-gray-700 dark:border-gray-600"></textarea>
     </div>
   </div>
 
@@ -95,45 +102,47 @@
   </div>
 
   <!-- Dock -->
-  <div class="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white/60 backdrop-blur rounded-xl px-4 py-2 flex space-x-6 z-40">
-    <img src="https://img.icons8.com/ios-filled/50/finder.png" title="Finder" class="w-10 dock-icon cursor-pointer" onclick="openApp('finder')" />
-    <img src="https://img.icons8.com/ios-filled/50/note.png" title="Notes" class="w-10 dock-icon cursor-pointer" onclick="openApp('notes')" />
-    <img src="https://img.icons8.com/ios-filled/50/settings.png" title="Settings" class="w-10 dock-icon cursor-pointer" onclick="openApp('settings')" />
-    <img src="https://img.icons8.com/ios-filled/50/internet.png" title="Browser" class="w-10 dock-icon cursor-pointer" onclick="openApp('browser')" />
-    <img src="https://img.icons8.com/ios-filled/50/controller.png" title="Games" class="w-10 dock-icon cursor-pointer" onclick="openApp('games')" />
+  <div id="dock" class="hidden">
+    <img src="https://img.icons8.com/ios-filled/50/finder.png" class="dock-icon" onclick="openApp('finder')" title="Finder" />
+    <img src="https://img.icons8.com/ios-filled/50/note.png" class="dock-icon" onclick="openApp('notes')" title="Notes" />
+    <img src="https://img.icons8.com/ios-filled/50/settings.png" class="dock-icon" onclick="openApp('settings')" title="Settings" />
+    <img src="https://img.icons8.com/ios-filled/50/internet.png" class="dock-icon" onclick="openApp('browser')" title="Browser" />
+    <img src="https://img.icons8.com/ios-filled/50/controller.png" class="dock-icon" onclick="openApp('games')" title="Games" />
   </div>
 
-  <!-- Script -->
   <script>
+    // Login Mechanism
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
       if (user === "admin" && pass === "1234") {
         document.getElementById("login-screen").classList.add("hidden");
+        document.getElementById("menuBar").classList.remove("hidden");
+        document.getElementById("dock").classList.remove("hidden");
       } else {
         document.getElementById("login-error").classList.remove("hidden");
       }
     }
 
+    // App Open/Close
     function openApp(id) {
       document.getElementById(id).classList.remove("hidden");
     }
-
     function closeApp(id) {
       document.getElementById(id).classList.add("hidden");
     }
 
+    // Dark Mode Toggle
     function toggleDarkMode() {
       document.documentElement.classList.toggle("dark");
       localStorage.setItem("darkMode", document.documentElement.classList.contains("dark"));
     }
-
     if (localStorage.getItem("darkMode") === "true") {
       document.documentElement.classList.add("dark");
       document.getElementById("darkModeToggle").checked = true;
     }
 
-    // Menu Time
+    // Live Clock in Menu Bar
     setInterval(() => {
       const now = new Date();
       document.getElementById("menu-time").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
