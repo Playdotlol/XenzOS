@@ -141,21 +141,23 @@ function showCalendar() {
   `);
 }
 
-// Taskbar buttons
+// Add apps to the dock
+const dockApps = [
+  { name: "Files", action: showFileExplorer, icon: "📁" },
+  { name: "Chat", action: showChatApp, icon: "💬" },
+  { name: "Voice", action: showVoiceAssistant, icon: "🎤" },
+  { name: "Tic-Tac-Toe", action: showTicTacToe, icon: "⭕" },
+  { name: "Calendar", action: showCalendar, icon: "📅" }
+];
+
+// Create Dock Buttons
 window.onload = () => {
-  const apps = [
-    { name: "Files", action: showFileExplorer },
-    { name: "Chat", action: showChatApp },
-    { name: "Voice", action: showVoiceAssistant },
-    { name: "Tic-Tac-Toe", action: showTicTacToe },
-    { name: "Calendar", action: showCalendar }
-  ];
-  const taskbar = document.getElementById("taskbar");
-  apps.forEach(app => {
-    const btn = document.createElement("button");
-    btn.textContent = app.name;
-    btn.className = "bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded";
-    btn.onclick = app.action;
-    taskbar.appendChild(btn);
+  const dock = document.getElementById("dock");
+  dockApps.forEach(app => {
+    const button = document.createElement("button");
+    button.className = "text-3xl";
+    button.innerHTML = app.icon;
+    button.onclick = () => app.action();
+    dock.appendChild(button);
   });
 };
