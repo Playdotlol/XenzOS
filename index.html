@@ -6,40 +6,271 @@
   <title>XenzOS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { margin: 0; }
-    .bg-gradient { background: linear-gradient(135deg, #00d2ff, #3a7bd5); }
-    .shadow-lg-custom { box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1); }
-    .glow { text-shadow: 0 0 10px rgba(255,255,255,0.8); }
-    .dock { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: rgba(30,30,30,0.8); padding: 5px 10px; border-radius: 16px; display: flex; gap: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-    .dock button { background: transparent; border: none; color: white; cursor: pointer; font-size: 32px; transition: transform .2s; }
-    .dock button:hover { transform: scale(1.2); }
-    #wallpaper { position: absolute; inset:0; background-size: cover; background-position: center; z-index: -1; }
-    .window { background: white; color: black; position: absolute; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+    @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow: hidden;
+    }
+    #wallpaper {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      filter: brightness(0.9);
+    }
+    #menuBar {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 24px;
+      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      font-size: 12px;
+      color: #fff;
+      z-index: 200;
+    }
+    #dock {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      backdrop-filter: blur(20px);
+      background: rgba(255,255,255,0.1);
+      border-radius: 16px;
+      display: flex;
+      gap: 20px;
+      padding: 8px 16px;
+      z-index: 200;
+    }
+    .dock button {
+      background: transparent;
+      border: none;
+      font-size: 32px;
+      color: #fff;
+      transition: transform 0.2s;
+    }
+    .dock button:hover {
+      transform: scale(1.2);
+    }
+    .window {
+      position: absolute;
+      background: #fff;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      display: flex;
+      flex-direction: column;
+    }
+    .win-header {
+      display: flex;
+      align-items: center;
+      padding: 8px;
+      background: rgba(230,230,230,0.8);
+      cursor: grab;
+    }
+    .win-header .btn {
+      margin-right: 8px;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+    .btn.red { background: #FF5F56; }
+    .btn.yellow { background: #FFBD2E; }
+    .btn.green { background: #27C93F; }
+    .window-content {
+      flex: 1;
+      padding: 10px;
+      overflow: auto;
+    }
+    #xenz-btn {
+      position: absolute;
+      top: 30px;
+      right: 20px;
+      z-index: 300;
+      background: rgba(255,255,255,0.3);
+      backdrop-filter: blur(6px);
+    }
   </style>
 </head>
-<body class="h-screen overflow-hidden font-sans">
+<body>
 
-  <!-- Wallpaper -->
-  <div id="wallpaper"></div>
+<div id="wallpaper"></div>
 
-  <!-- Login Overlay -->
-  <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-gradient z-50">
-    <div class="bg-gray-900 p-8 rounded-xl shadow-2xl space-y-6 text-center w-96">
-      <h1 class="text-3xl font-bold glow">XenzOS</h1>
-      <p class="text-lg text-gray-300">Please log in to continue</p>
-      <input id="username" type="text" placeholder="Username" class="w-full p-3 rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-      <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-semibold">Login</button>
-      <p id="login-error" class="text-red-500 text-sm hidden">Invalid username or password</p>
-    </div>
+<!-- Login Screen -->
+<div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 z-300">
+  <div class="bg-black/60 p-10 rounded-2xl text-center text-white shadow-2xl">
+    <h1 class="text-4xl font-semibold mb-6">🔐 Welcome to XenzOS</h1>
+    <input id="username" type="text" placeholder="Username" class="mb-2 w-full p-3 rounded bg-gray-800 focus:outline-none" /><br/>
+    <input id="password" type="password" placeholder="Password" class="mb-4 w-full p-3 rounded bg-gray-800 focus:outline-none" /><br/>
+    <button onclick="login()" class="bg-gradient-to-r from-purple-600 to-blue-500 px-6 py-2 rounded-full hover:opacity-90">Login</button>
+    <p id="login-error" class="text-red-400 mt-3 hidden">Invalid credentials</p>
   </div>
+</div>
 
-  <!-- Desktop + Dock -->
-  <div id="desktop" class="relative w-full h-full" style="display:none;">
-    <div id="windows"></div>
-    <div class="dock" id="dock"></div>
-  </div>
+<!-- Menu Bar -->
+<div id="menuBar" style="display:none;">🍎 XenzOS</div>
 
-  <script src="script.js"></script>
+<!-- Desktop -->
+<div id="desktop" style="display:none;">
+  <div id="windows"></div>
+  <div id="dock" class="dock"></div>
+  <button id="xenz-btn" class="p-2 text-white rounded-full" onclick="startAssistant()">🎙️</button>
+</div>
+
+<script>
+  const wallpapers = [
+    'https://source.unsplash.com/collection/928423/1920x1080',
+    'https://source.unsplash.com/collection/181581/1920x1080',
+    'https://wallpapercave.com/wp/wp5128415.jpg'
+  ];
+  const cred = { username: 'admin', password: '1234' };
+  let z = 100, count = 0;
+
+  function setWallpaper() {
+    document.getElementById('wallpaper').style.backgroundImage =
+      `url(${wallpapers[Math.floor(Math.random() * wallpapers.length)]})`;
+  }
+
+  function login() {
+    const u = document.getElementById('username').value;
+    const p = document.getElementById('password').value;
+    if (u === cred.username && p === cred.password) {
+      document.getElementById('login-screen').style.display = 'none';
+      document.getElementById('menuBar').style.display = 'flex';
+      document.getElementById('desktop').style.display = 'block';
+      setWallpaper();
+      initDock();
+    } else {
+      document.getElementById('login-error').classList.remove('hidden');
+    }
+  }
+
+  function showNotification(text) {
+    const note = document.createElement('div');
+    note.innerText = text;
+    Object.assign(note.style, {
+      position: 'fixed',
+      top: '10px',
+      right: '10px',
+      background: 'rgba(255,255,255,0.8)',
+      color: '#000',
+      padding: '10px',
+      borderRadius: '5px',
+      boxShadow: '0 2px 8px rgba(0,0,0,0.2)',
+      zIndex: 500
+    });
+    document.body.appendChild(note);
+    setTimeout(() => note.remove(), 4000);
+  }
+
+  function createWindow(title, content) {
+    const win = document.createElement('div');
+    win.className = 'window';
+    win.style.top = 50 + count * 20 + 'px';
+    win.style.left = 50 + count * 20 + 'px';
+    win.style.width = '500px';
+    win.style.height = '350px';
+    win.style.zIndex = ++z;
+    win.innerHTML = `
+      <div class="win-header">
+        <div class="btn red" onclick="this.closest('.window').remove()"></div>
+        <div class="btn yellow"></div>
+        <div class="btn green"></div>
+        <div class="ml-4 font-medium">${title}</div>
+      </div>
+      <div class="window-content">${content}</div>`;
+    makeDraggable(win);
+    document.getElementById('windows').appendChild(win);
+    count++;
+  }
+
+  function makeDraggable(w) {
+    const h = w.firstElementChild;
+    h.onmousedown = e => {
+      const r = w.getBoundingClientRect();
+      const offX = e.clientX - r.left, offY = e.clientY - r.top;
+      function move(m) {
+        w.style.left = m.clientX - offX + 'px';
+        w.style.top = m.clientY - offY + 'px';
+      }
+      document.addEventListener('mousemove', move);
+      document.addEventListener('mouseup', () => document.removeEventListener('mousemove', move), { once: true });
+    };
+  }
+
+  function startAssistant() {
+    const r = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    r.lang = 'en-US';
+    r.start();
+    r.onresult = e => {
+      const cmd = e.results[0][0].transcript.toLowerCase();
+      if (cmd.includes('notes')) appNotes();
+      else if (cmd.includes('chat')) appChat();
+      else if (cmd.includes('games')) appGames();
+      else if (cmd.includes('terminal')) appTerminal();
+      else alert('XenzAssist: Command not recognized.');
+    };
+    r.onerror = () => alert("XenzAssist didn’t catch that.");
+  }
+
+  function appFiles() { createWindow('Files', '📁 Documents<br>📁 Music<br>📄 notes.txt'); }
+  function appNotes() { createWindow('Notes', `<textarea class="w-full h-full p-2 resize-none border">Your notes...</textarea>`); }
+  function appChat() {
+    createWindow('Chat', `<div id="cb" class="h-40 overflow-y-auto border mb-2"></div>
+      <input id="ci" class="w-full p-2 border mb-1">
+      <button onclick="document.getElementById('cb').innerHTML += '<div>👤 ' + document.getElementById('ci').value + '</div>';document.getElementById('ci').value=''" class="w-full bg-blue-600 text-white p-2 rounded">Send</button>`);
+  }
+  function appTerminal() {
+    createWindow('Terminal', `<div id="tout" class="h-48 overflow-auto bg-black text-green-400 p-2 font-mono"></div>
+      <input id="tin" class="w-full p-2 bg-gray-900 text-white font-mono">
+      <button onclick="let i=document.getElementById('tin'),o=document.getElementById('tout');o.innerHTML+='$ '+i.value+'<br/>';i.value='';" class="w-full bg-gray-800 text-white p-2 mt-1 rounded">Run</button>`);
+  }
+  function appBrowser() {
+    createWindow('Browser', `<iframe src="https://example.com" style="border:none;width:100%;height:100%;"></iframe>`);
+  }
+  function appCalculator() {
+    createWindow('Calculator', `<iframe src="https://www.desmos.com/scientific" style="border:none;width:100%;height:100%;"></iframe>`);
+  }
+  function appMusic() {
+    createWindow('Music Player', `<iframe src="https://open.spotify.com/embed/playlist/37i9dQZF1DXcBWIGoYBM5M" width="100%" height="100%" frameBorder="0" allowtransparency="true" allow="encrypted-media"></iframe>`);
+  }
+  function appWeather() {
+    createWindow('Weather', `<iframe src="https://forecast7.com/en/37d77n122d42/san-francisco/" style="width:100%;height:100%;border:0;"></iframe>`);
+  }
+  function appSettings() {
+    createWindow('Settings', `<button onclick="setWallpaper()" class="bg-blue-600 text-white px-4 py-2 rounded">Change Wallpaper</button>`);
+  }
+  function appGames() {
+    createWindow('Games', `<iframe src="https://classroom6x.org/" style="width:100%;height:100%;border:0;"></iframe>`);
+  }
+
+  function initDock() {
+    const apps = [
+      ['📁', 'Files', appFiles],
+      ['📝', 'Notes', appNotes],
+      ['💬', 'Chat', appChat],
+      ['💻', 'Terminal', appTerminal],
+      ['🌐', 'Browser', appBrowser],
+      ['🧮', 'Calculator', appCalculator],
+      ['🎵', 'Music', appMusic],
+      ['🌤️', 'Weather', appWeather],
+      ['⚙️', 'Settings', appSettings],
+      ['🎮', 'Games', appGames]
+    ];
+
+    apps.forEach(([icon, title, func]) => {
+      const btn = document.createElement('button');
+      btn.innerText = icon;
+      btn.title = title;
+      btn.onclick = func;
+      document.getElementById('dock').appendChild(btn);
+    });
+  }
+</script>
+
 </body>
 </html>
