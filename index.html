@@ -74,15 +74,6 @@
       background: rgba(50, 50, 50, 0.7);
     }
 
-    /* Dark Mode toggle button */
-    #dark-mode-btn {
-      background-color: #333;
-      color: #fff;
-      border-radius: 12px;
-      padding: 10px;
-      cursor: pointer;
-    }
-
     .window-content {
       flex: 1;
       padding: 10px;
@@ -93,11 +84,20 @@
       background-color: #444;
       color: #fff;
     }
+
+    #settings-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background-color: #333;
+      color: #fff;
+      padding: 10px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
-
-<div id="wallpaper"></div>
 
 <!-- Login Screen -->
 <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-gray-800 z-300">
@@ -118,6 +118,22 @@
   <div id="windows"></div>
   <div id="dock" class="dock"></div>
   <button id="xenz-btn" class="p-2 text-white rounded-full" onclick="startAssistant()">🎙️</button>
+</div>
+
+<!-- Settings Button -->
+<button id="settings-btn" onclick="openSettings()">⚙️ Settings</button>
+
+<!-- Settings Window -->
+<div id="settings-window" class="window" style="display: none; z-index: 9999;">
+  <div class="win-header">
+    <h2 class="text-xl">Settings</h2>
+    <button onclick="closeSettings()">✖️</button>
+  </div>
+  <div class="window-content">
+    <h3 class="text-lg">Theme Settings</h3>
+    <label for="dark-mode-toggle">Enable Dark Mode</label>
+    <input type="checkbox" id="dark-mode-toggle" />
+  </div>
 </div>
 
 <script>
@@ -163,20 +179,30 @@
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme === 'true') {
       document.body.classList.add('dark');
+      document.getElementById('dark-mode-toggle').checked = true;
     } else {
       document.body.classList.remove('dark');
+      document.getElementById('dark-mode-toggle').checked = false;
     }
   }
 
   // Call the function to load the theme when the page loads
   loadTheme();
 
-  // Create a Dark Mode button in the menu bar
-  const themeButton = document.createElement('button');
-  themeButton.id = 'dark-mode-btn';
-  themeButton.innerHTML = '🌙';
-  themeButton.onclick = toggleTheme;
-  document.getElementById('menuBar').appendChild(themeButton);
+  // Event listener for the Dark Mode toggle in the Settings window
+  document.getElementById('dark-mode-toggle').addEventListener('change', function() {
+    toggleTheme();
+  });
+
+  // Open Settings Window
+  function openSettings() {
+    document.getElementById('settings-window').style.display = 'block';
+  }
+
+  // Close Settings Window
+  function closeSettings() {
+    document.getElementById('settings-window').style.display = 'none';
+  }
 
   // Show notifications
   function showNotification(text) {
@@ -195,6 +221,33 @@
     });
     document.body.appendChild(note);
     setTimeout(() => note.remove(), 4000);
+  }
+
+  // Initialize the Dock with apps
+  function initDock() {
+    const apps = [
+      ['📝', 'Notes', () => openApp('Notes')],
+      ['💬', 'Chat', () => openApp('Chat')],
+      ['🎮', 'Games', () => openApp('Games')],
+      ['🌍', 'Browser', () => openApp('Browser')],
+      ['🎵', 'Music', () => openApp('Music')],
+      ['☀️', 'Weather', () => openApp('Weather')],
+      ['🖥️', 'Terminal', () => openApp('Terminal')],
+      ['⚙️', 'Settings', openSettings]
+    ];
+
+    apps.forEach(([icon, title, func]) => {
+      const btn = document.createElement('button');
+      btn.innerText = icon;
+      btn.title = title;
+      btn.onclick = func;
+      document.getElementById('dock').appendChild(btn);
+    });
+  }
+
+  // Open an app in a new window (dummy function for now)
+  function openApp(name) {
+    alert(`Opening ${name} app...`);
   }
 </script>
 
