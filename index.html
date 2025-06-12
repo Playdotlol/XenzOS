@@ -1,315 +1,291 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XenzOS - macOS Experience</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    /* Basic macOS-like style */
-    body {
-      margin: 0;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', sans-serif;
-      overflow: hidden;
-      background: #f4f4f5;
-      transition: background 0.3s ease-in-out;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XenzOS - macOS Experience</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* General Body Styles (macOS-like) */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", sans-serif;
+            background-color: #f0f0f5;
+            overflow: hidden;
+        }
 
-    /* Light and Dark Mode */
-    body {
-      background-color: #f5f5f5;
-      background-image: url('https://source.unsplash.com/collection/928423/1920x1080');
-      background-size: cover;
-      background-position: center;
-    }
-    .dark body {
-      background-color: #121212;
-      background-image: url('https://source.unsplash.com/collection/181581/1920x1080');
-      filter: brightness(0.4);
-    }
+        /* Dark Mode */
+        body.dark {
+            background-color: #1c1c1c;
+            color: white;
+        }
 
-    /* Window style (macOS-like) */
-    .window {
-      background-color: #fff;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-      max-width: 400px;
-      max-height: 300px;
-      margin: 10px;
-    }
+        /* Header (Menu Bar) */
+        #menuBar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 24px;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 10;
+        }
 
-    .dark .window {
-      background-color: #1e1e1e;
-      color: #fff;
-    }
+        .dark #menuBar {
+            background-color: rgba(50, 50, 50, 0.7);
+        }
 
-    .win-header {
-      background-color: #f0f0f5;
-      display: flex;
-      justify-content: space-between;
-      padding: 12px;
-      border-bottom: 1px solid #ddd;
-      border-radius: 16px 16px 0 0;
-    }
-    .dark .win-header {
-      background-color: #444;
-      border-bottom: 1px solid #333;
-    }
+        /* App Window Styles */
+        .window {
+            width: 400px;
+            height: 250px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+        }
 
-    .window-content {
-      padding: 20px;
-      overflow: auto;
-      max-height: 200px;
-    }
+        .window-header {
+            background-color: #f1f1f1;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+            align-items: center;
+        }
 
-    /* Dock styles (macOS-like dock) */
-    #dock {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: rgba(0, 0, 0, 0.5);
-      height: 80px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-      border-radius: 20px 20px 0 0;
-    }
+        .dark .window {
+            background-color: #333;
+        }
 
-    .dock button {
-      background: transparent;
-      border: none;
-      font-size: 30px;
-      color: #fff;
-      padding: 15px;
-      margin: 0 10px;
-      transition: transform 0.2s ease;
-    }
+        /* Dock Styles */
+        #dock {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            height: 80px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            border-radius: 20px 20px 0 0;
+        }
 
-    .dock button:hover {
-      transform: scale(1.2);
-    }
+        .dock-button {
+            background-color: transparent;
+            border: none;
+            font-size: 30px;
+            color: #fff;
+            padding: 15px;
+            margin: 0 10px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out;
+        }
 
-    /* Menu Bar (macOS-like menu bar) */
-    #menuBar {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 24px;
-      background: rgba(255, 255, 255, 0.2);
-      display: flex;
-      align-items: center;
-      padding: 0 10px;
-      font-size: 12px;
-      color: #fff;
-      z-index: 200;
-    }
-    .dark #menuBar {
-      background: rgba(50, 50, 50, 0.7);
-    }
+        .dock-button:hover {
+            transform: scale(1.2);
+        }
 
-    /* Settings Window */
-    #settings-window {
-      position: absolute;
-      top: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 300px;
-      background-color: #fff;
-      padding: 15px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-      display: none;
-      z-index: 9999;
-    }
+        /* Login Screen */
+        #login-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
 
-    /* Settings Button */
-    #settings-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background-color: #333;
-      color: #fff;
-      padding: 12px;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+        #login-screen .login-box {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            width: 300px;
+            text-align: center;
+            box-shadow: 0px 10px 50px rgba(0, 0, 0, 0.3);
+        }
 
-    /* Login Screen */
-    #login-screen {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: rgba(0, 0, 0, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 999;
-    }
+        #login-screen input {
+            background-color: #f0f0f5;
+            border: 1px solid #ccc;
+            padding: 12px;
+            margin: 10px 0;
+            width: 100%;
+            border-radius: 8px;
+        }
 
-    #login-screen input {
-      background-color: #444;
-      color: #fff;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      margin-bottom: 12px;
-      width: 200px;
-    }
+        #login-screen button {
+            background-color: #007aff;
+            color: white;
+            padding: 12px;
+            width: 100%;
+            border-radius: 8px;
+            cursor: pointer;
+            border: none;
+        }
 
-    #login-screen button {
-      background-color: #0061f2;
-      color: white;
-      padding: 12px;
-      border-radius: 8px;
-      border: none;
-      width: 220px;
-      cursor: pointer;
-    }
-  </style>
+        /* App Window Content */
+        .window-content {
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        /* Settings Window */
+        #settings-window {
+            display: none;
+            background-color: white;
+            width: 300px;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        .dark #settings-window {
+            background-color: #333;
+        }
+    </style>
 </head>
-<body>
 
-<!-- Login Screen -->
-<div id="login-screen">
-  <div class="text-white text-center">
-    <h2 class="text-3xl mb-6">Welcome to XenzOS</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-    <p id="login-error" class="text-red-500 mt-2 hidden">Invalid credentials. Try again!</p>
-  </div>
-</div>
+<body class="bg-gray-100">
 
-<!-- Menu Bar -->
-<div id="menuBar" style="display:none;">🍎 XenzOS</div>
+    <!-- Login Screen -->
+    <div id="login-screen">
+        <div class="login-box">
+            <h2 class="text-3xl font-bold text-gray-800 mb-6">XenzOS</h2>
+            <input type="text" id="username" class="px-4 py-2 rounded-lg w-full mb-4" placeholder="Username" />
+            <input type="password" id="password" class="px-4 py-2 rounded-lg w-full mb-4" placeholder="Password" />
+            <button onclick="login()" class="bg-blue-600 text-white py-2 px-4 rounded-lg w-full">Login</button>
+            <p id="login-error" class="text-red-500 hidden mt-3">Invalid credentials. Try again!</p>
+        </div>
+    </div>
 
-<!-- Desktop Area -->
-<div id="desktop" style="display:none;">
-  <div id="windows"></div>
-  <div id="dock" class="dock"></div>
-</div>
+    <!-- Menu Bar (macOS-like) -->
+    <div id="menuBar" class="bg-transparent flex justify-between items-center px-8 py-2 text-white">
+        <span>🍏 XenzOS</span>
+        <div class="flex gap-4">
+            <span>File</span>
+            <span>Edit</span>
+            <span>View</span>
+        </div>
+    </div>
 
-<!-- Settings Window -->
-<div id="settings-window" class="window">
-  <div class="win-header">
-    <h2>Settings</h2>
-    <button onclick="closeSettings()">✖️</button>
-  </div>
-  <div class="window-content">
-    <h3>Theme Settings</h3>
-    <label for="dark-mode-toggle">Enable Dark Mode</label>
-    <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()" />
-  </div>
-</div>
+    <!-- Dock (macOS-like) -->
+    <div id="dock" class="bg-gray-800 fixed bottom-0 left-0 right-0 flex justify-center items-center py-4 rounded-t-xl z-50">
+        <button class="dock-button text-white" title="Notes" onclick="openApp('Notes')">📝</button>
+        <button class="dock-button text-white" title="Games" onclick="openApp('Games')">🎮</button>
+        <button class="dock-button text-white" title="Browser" onclick="openApp('Browser')">🌐</button>
+        <button class="dock-button text-white" title="Settings" onclick="openSettings()">⚙️</button>
+    </div>
 
-<script>
-  const cred = { username: 'admin', password: '1234' };
-  
-  // Login function
-  function login() {
-    const u = document.getElementById('username').value;
-    const p = document.getElementById('password').value;
-    if (u === cred.username && p === cred.password) {
-      document.getElementById('login-screen').style.display = 'none';
-      document.getElementById('menuBar').style.display = 'flex';
-      document.getElementById('desktop').style.display = 'block';
-      setWallpaper();
-      initDock();
-    } else {
-      document.getElementById('login-error').classList.remove('hidden');
-    }
-  }
+    <!-- Settings Window -->
+    <div id="settings-window" class="hidden">
+        <h3 class="text-xl font-semibold">Settings</h3>
+        <div class="flex items-center mt-4">
+            <label for="dark-mode-toggle" class="mr-2">Enable Dark Mode</label>
+            <input type="checkbox" id="dark-mode-toggle" onchange="toggleDarkMode()" class="rounded-md" />
+        </div>
+        <button onclick="closeSettings()" class="bg-blue-600 text-white py-2 px-4 rounded-lg w-full mt-4">Close</button>
+    </div>
 
-  // Set Wallpaper
-  function setWallpaper() {
-    document.body.style.backgroundImage = `url('https://source.unsplash.com/collection/928423/1920x1080')`;
-  }
+    <!-- App Windows -->
+    <div id="Notes" class="window bg-white">
+        <div class="window-header bg-gray-100 p-4 flex justify-between items-center rounded-t-xl">
+            <span>Notes</span>
+            <button onclick="closeWindow('Notes')" class="text-gray-600">✖️</button>
+        </div>
+        <div class="window-content p-4">
+            <textarea rows="10" cols="30" class="w-full p-2 rounded-lg border-2"></textarea>
+        </div>
+    </div>
 
-  // Toggle Dark Mode
-  function toggleDarkMode() {
-    const body = document.body;
-    body.classList.toggle('dark');
-    localStorage.setItem('darkMode', body.classList.contains('dark'));
-    showNotification(body.classList.contains('dark') ? "Dark Mode enabled" : "Light Mode enabled");
-  }
+    <div id="Games" class="window bg-white">
+        <div class="window-header bg-gray-100 p-4 flex justify-between items-center rounded-t-xl">
+            <span>Games</span>
+            <button onclick="closeWindow('Games')" class="text-gray-600">✖️</button>
+        </div>
+        <div class="window-content p-4">
+            <h3>Game App Placeholder</h3>
+            <iframe src="https://classroom6x.org/" width="100%" height="100%"></iframe>
+        </div>
+    </div>
 
-  // Load Dark Mode from LocalStorage
-  function loadDarkMode() {
-    const savedTheme = localStorage.getItem('darkMode');
-    if (savedTheme === 'true') {
-      document.body.classList.add('dark');
-      document.getElementById('dark-mode-toggle').checked = true;
-    } else {
-      document.body.classList.remove('dark');
-      document.getElementById('dark-mode-toggle').checked = false;
-    }
-  }
+    <div id="Browser" class="window bg-white">
+        <div class="window-header bg-gray-100 p-4 flex justify-between items-center rounded-t-xl">
+            <span>Browser</span>
+            <button onclick="closeWindow('Browser')" class="text-gray-600">✖️</button>
+        </div>
+        <div class="window-content p-4">
+            <input type="text" placeholder="Search or type URL" class="p-2 rounded-md w-full mb-4" />
+            <iframe src="https://www.google.com" width="100%" height="500"></iframe>
+        </div>
+    </div>
 
-  // Show notifications
-  function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.innerText = message;
-    notification.style.position = 'fixed';
-    notification.style.top = '10px';
-    notification.style.right = '10px';
-    notification.style.background = 'rgba(0, 0, 0, 0.7)';
-    notification.style.color = '#fff';
-    notification.style.padding = '10px';
-    notification.style.borderRadius = '8px';
-    notification.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
-    document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 3000);
-  }
+    <script>
+        // Dummy Credentials for login
+        const cred = { username: "admin", password: "1234" };
 
-  // Initialize Dock with apps
-  function initDock() {
-    const apps = [
-      ['📝', 'Notes', openApp],
-      ['💬', 'Chat', openApp],
-      ['🎮', 'Games', openApp],
-      ['🌍', 'Browser', openApp],
-      ['🎵', 'Music', openApp],
-      ['🖥️', 'Terminal', openApp],
-      ['⚙️', 'Settings', openSettings]
-    ];
+        function login() {
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
+            if (username === cred.username && password === cred.password) {
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("menuBar").style.display = "flex";
+                document.body.style.overflow = "visible";
+            } else {
+                document.getElementById("login-error").classList.remove("hidden");
+            }
+        }
 
-    apps.forEach(([icon, title, func]) => {
-      const btn = document.createElement('button');
-      btn.innerHTML = icon;
-      btn.title = title;
-      btn.onclick = func;
-      document.getElementById('dock').appendChild(btn);
-    });
-  }
+        function openApp(appName) {
+            document.getElementById(appName).style.display = "block";
+        }
 
-  // Open App Functionality (Dummy for now)
-  function openApp() {
-    alert("App opened");
-  }
+        function closeWindow(appName) {
+            document.getElementById(appName).style.display = "none";
+        }
 
-  // Open Settings
-  function openSettings() {
-    document.getElementById('settings-window').style.display = 'block';
-  }
+        function openSettings() {
+            document.getElementById("settings-window").classList.remove("hidden");
+        }
 
-  // Close Settings
-  function closeSettings() {
-    document.getElementById('settings-window').style.display = 'none';
-  }
+        function closeSettings() {
+            document.getElementById("settings-window").classList.add("hidden");
+        }
 
-  // Initialize dark mode and login screen
-  loadDarkMode();
-</script>
+        function toggleDarkMode() {
+            document.body.classList.toggle("dark");
+            localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+        }
+
+        // Load Dark Mode from localStorage
+        if (localStorage.getItem("darkMode") === "true") {
+            document.body.classList.add("dark");
+            document.getElementById("dark-mode-toggle").checked = true;
+        }
+    </script>
 
 </body>
+
 </html>
