@@ -3,26 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WebOS Pro</title>
+  <title>XenzOS</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom Styles */
+    .bg-gradient {
+      background: linear-gradient(135deg, #00d2ff, #3a7bd5);
+    }
+    .shadow-lg-custom {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    .glow {
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-gray-800 to-black text-white h-screen overflow-hidden">
+<body class="bg-black text-white font-sans h-screen">
 
   <!-- Login Screen -->
-  <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-black z-50">
-    <div class="bg-gray-900 p-8 rounded-xl shadow-2xl w-80 space-y-4 text-center">
-      <h1 class="text-xl font-bold">Welcome to Web OS Pro</h1>
-      <input id="username" type="text" placeholder="Username" class="w-full p-2 rounded bg-gray-700 text-white">
-      <input id="password" type="password" placeholder="Password" class="w-full p-2 rounded bg-gray-700 text-white">
-      <button onclick="login()" class="w-full bg-blue-600 p-2 rounded">Login</button>
-      <p id="login-error" class="hidden text-red-400 text-sm">Invalid credentials</p>
+  <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-gradient z-50">
+    <div class="bg-gray-900 p-8 rounded-xl shadow-2xl space-y-6 text-center w-96">
+      <h1 class="text-3xl font-bold glow">XenzOS</h1>
+      <p class="text-lg text-gray-300">Please log in to continue</p>
+      <input id="username" type="text" placeholder="Username" class="w-full p-3 rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <input id="password" type="password" placeholder="Password" class="w-full p-3 rounded bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-700 p-3 rounded font-semibold">Login</button>
+      <p id="login-error" class="text-red-500 text-sm hidden">Invalid username or password</p>
     </div>
   </div>
 
   <!-- Desktop UI -->
   <div id="desktop" class="relative w-full h-full overflow-hidden">
     <!-- Taskbar -->
-    <div class="absolute bottom-0 w-full bg-gray-900 p-2 flex gap-2" id="taskbar"></div>
+    <div class="absolute bottom-0 w-full bg-gray-900 p-3 flex gap-3 shadow-lg-custom" id="taskbar"></div>
 
     <!-- Windows container -->
     <div id="windows" class="absolute inset-0"></div>
