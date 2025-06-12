@@ -1,152 +1,189 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>XenzOS</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>XenzOS — macOS Lite</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Inter", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI";
+      margin: 0;
+      height:100%;
+      background: center/cover url('https://source.unsplash.com/1920x1080/?nature');
     }
-    #login-screen {
-      @apply fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50;
+    .blur { backdrop-filter: blur(10px); }
+
+    /* Login */
+    #login {
+      @apply fixed inset-0 flex items-center justify-center bg-black bg-opacity-75;
     }
-    #login-box {
-      @apply bg-white rounded-xl p-10 shadow-2xl w-80 text-center;
+    #login .card {
+      @apply bg-gray-800 bg-opacity-80 p-8 rounded-xl text-center text-white space-y-4;
     }
-    #menuBar {
-      @apply fixed top-0 left-0 right-0 h-8 bg-white bg-opacity-70 backdrop-blur flex justify-between px-4 items-center z-40;
+    #login input {
+      @apply w-full p-3 rounded bg-gray-700 text-white placeholder-gray-400;
     }
-    .dark #menuBar {
-      @apply bg-gray-900 bg-opacity-70 text-white;
+    #login button {
+      @apply w-full py-2 bg-blue-600 hover:bg-blue-700 rounded text-white;
     }
-    .app-window {
-      @apply absolute top-20 left-1/2 transform -translate-x-1/2 w-2/5 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border dark:border-gray-600 overflow-hidden;
-      min-height: 200px;
+
+    /* Menu bar */
+    #menubar {
+      @apply fixed top-0 left-0 right-0 h-6 flex items-center justify-between text-gray-800 dark:text-gray-200 text-xs px-4 z-50 blur bg-white bg-opacity-60;
     }
-    .app-header {
-      @apply flex justify-between items-center bg-gray-100 dark:bg-gray-700 text-gray-900 dark:text-gray-100 px-4 py-2 font-medium;
-    }
-    .app-content {
-      @apply p-4 text-gray-800 dark:text-gray-200;
-    }
+    .dark #menubar { @apply bg-gray-900 bg-opacity-60; }
+
+    /* Dock */
     #dock {
-      @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-white bg-opacity-60 backdrop-blur rounded-xl px-4 py-2 flex space-x-6 z-40;
+      @apply fixed bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4 px-6 py-3 rounded-full blur bg-white bg-opacity-60 z-50;
     }
     .dock-icon {
-      @apply w-10 cursor-pointer transition-transform;
+      @apply w-10 h-10 transition-transform cursor-pointer;
     }
-    .dock-icon:hover {
-      @apply scale-125;
+    .dock-icon:hover { transform: scale(1.3); }
+
+    /* Window */
+    .window {
+      @apply absolute bg-white dark:bg-gray-800 rounded-lg shadow-2xl border dark:border-gray-600;
+      width: 400px;
+      display: none;
+    }
+    .titlebar {
+      @apply flex items-center justify-between p-2 bg-gray-100 dark:bg-gray-700 rounded-t-lg;
+    }
+    .titlebtn {
+      @apply w-3 h-3 rounded-full inline-block;
+    }
+    .titlebtn.red { background:#ff605c; }
+    .titlebtn.yellow { background:#ffbd2e; }
+    .titlebtn.green { background:#28ca41; }
+    .titlebar span {
+      @apply flex-1 text-center text-gray-800 dark:text-gray-200 font-medium;
+    }
+    .content { @apply p-4 text-gray-800 dark:text-gray-200; }
+
+    /* Settings */
+    #settings {
+      display:none;
+      width:300px;
     }
   </style>
 </head>
-<body class="h-full bg-cover bg-center" style="background-image: url('https://source.unsplash.com/collection/928423/1920x1080')">
+<body class="h-full dark:bg-gray-900">
 
-  <!-- Login Screen -->
-  <div id="login-screen">
-    <div id="login-box">
-      <h2 class="text-2xl font-bold mb-4">Welcome to XenzOS</h2>
-      <input id="username" type="text" placeholder="Username" class="block w-full px-4 py-2 mb-4 rounded border" />
-      <input id="password" type="password" placeholder="Password" class="block w-full px-4 py-2 mb-6 rounded border" />
-      <button onclick="login()" class="bg-blue-600 text-white py-2 px-4 rounded-lg w-full">Login</button>
-      <p id="login-error" class="text-red-500 mt-3 hidden">Invalid credentials</p>
+  <!-- Login -->
+  <div id="login">
+    <div class="card">
+      <div class="w-24 h-24 bg-gray-600 rounded-full mx-auto mb-4"></div>
+      <h2 class="text-xl font-semibold">XenzOS</h2>
+      <input id="user" placeholder="Username" />
+      <input id="pass" type="password" placeholder="Password" />
+      <button onclick="doLogin()">Log In</button>
+      <p id="loginErr" class="text-red-400 hidden">Invalid credentials</p>
     </div>
   </div>
 
   <!-- Menu Bar -->
-  <div id="menuBar" class="hidden">
-    <div class="flex space-x-4">
-      <span class="font-semibold"> Finder</span>
-      <span>File</span><span>Edit</span><span>View</span><span>Go</span><span>Window</span><span>Help</span>
-    </div>
-    <div id="menu-time" class="text-sm"></div>
-  </div>
-
-  <!-- Apps: Finder, Notes, Settings, Browser, Games -->
-  <div id="finder" class="app-window hidden">
-    <div class="app-header">Finder <button onclick="closeApp('finder')">✕</button></div>
-    <div class="app-content">🗂️ Finder coming soon...</div>
-  </div>
-
-  <div id="notes" class="app-window hidden">
-    <div class="app-header">Notes <button onclick="closeApp('notes')">✕</button></div>
-    <div class="app-content">
-      <textarea class="w-full h-40 p-2 border rounded dark:bg-gray-700 dark:border-gray-600"></textarea>
-    </div>
-  </div>
-
-  <div id="settings" class="app-window hidden">
-    <div class="app-header">Settings <button onclick="closeApp('settings')">✕</button></div>
-    <div class="app-content">
-      <label class="flex items-center space-x-2">
-        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()" />
-        <span>Enable Dark Mode</span>
-      </label>
-    </div>
-  </div>
-
-  <div id="browser" class="app-window hidden">
-    <div class="app-header">Browser <button onclick="closeApp('browser')">✕</button></div>
-    <div class="app-content">
-      <iframe src="https://google.com" class="w-full h-64 rounded border"></iframe>
-    </div>
-  </div>
-
-  <div id="games" class="app-window hidden">
-    <div class="app-header">Games <button onclick="closeApp('games')">✕</button></div>
-    <div class="app-content">
-      <iframe src="https://classroom6x.org" class="w-full h-64 rounded border"></iframe>
-    </div>
+  <div id="menubar" class="hidden">
+    <div class="flex space-x-4"><span> Finder</span><span>File</span><span>Edit</span><span>View</span><span>Help</span></div>
+    <div id="time"></div>
   </div>
 
   <!-- Dock -->
   <div id="dock" class="hidden">
-    <img src="https://img.icons8.com/ios-filled/50/finder.png" class="dock-icon" onclick="openApp('finder')" title="Finder" />
-    <img src="https://img.icons8.com/ios-filled/50/note.png" class="dock-icon" onclick="openApp('notes')" title="Notes" />
-    <img src="https://img.icons8.com/ios-filled/50/settings.png" class="dock-icon" onclick="openApp('settings')" title="Settings" />
-    <img src="https://img.icons8.com/ios-filled/50/internet.png" class="dock-icon" onclick="openApp('browser')" title="Browser" />
-    <img src="https://img.icons8.com/ios-filled/50/controller.png" class="dock-icon" onclick="openApp('games')" title="Games" />
+    <img src="https://img.icons8.com/ios-filled/50/finder.png" class="dock-icon" onclick="openApp('finder')" title="Finder"/>
+    <img src="https://img.icons8.com/ios-filled/50/note.png" class="dock-icon" onclick="openApp('notes')" title="Notes"/>
+    <img src="https://img.icons8.com/ios-filled/50/browser.png" class="dock-icon" onclick="openApp('browser')" title="Browser"/>
+    <img src="https://img.icons8.com/ios-filled/50/controller.png" class="dock-icon" onclick="openApp('games')" title="Games"/>
+    <img src="https://img.icons8.com/ios-filled/50/settings.png" class="dock-icon" onclick="openApp('settings')" title="Settings"/>
+  </div>
+
+  <!-- Windows -->
+  <div id="finder" class="window" style="top:80px;left:20%;">
+    <div class="titlebar">
+      <div>
+        <div class="titlebtn red inline-block"></div>
+        <div class="titlebtn yellow inline-block ml-1"></div>
+        <div class="titlebtn green inline-block ml-1"></div>
+      </div>
+      <span>Finder</span>
+      <span class="w-12"></span>
+    </div>
+    <div class="content">Finder coming soon…</div>
+  </div>
+
+  <div id="notes" class="window" style="top:120px;left:30%;">
+    <div class="titlebar">
+      <div>
+        <div class="titlebtn red"></div>
+        <div class="titlebtn yellow inline-block ml-1"></div>
+        <div class="titlebtn green inline-block ml-1"></div>
+      </div>
+      <span>Notes</span>
+      <span class="w-12"></span>
+    </div>
+    <div class="content"><textarea class="w-full h-32 border rounded dark:bg-gray-700"></textarea></div>
+  </div>
+
+  <div id="browser" class="window" style="top:160px;left:40%;">
+    <div class="titlebar">
+      <div>
+        <div class="titlebtn red"></div>
+        <div class="titlebtn yellow inline-block ml-1"></div>
+        <div class="titlebtn green inline-block ml-1"></div>
+      </div>
+      <span>Browser</span>
+      <span class="w-12"></span>
+    </div>
+    <div class="content"><iframe src="https://google.com" class="w-full h-48 rounded border"></iframe></div>
+  </div>
+
+  <div id="games" class="window" style="top:200px;left:50%;">
+    <div class="titlebar">
+      <div>
+        <div class="titlebtn red"></div>
+        <div class="titlebtn yellow inline-block ml-1"></div>
+        <div class="titlebtn green inline-block ml-1"></div>
+      </div>
+      <span>Games</span>
+      <span class="w-12"></span>
+    </div>
+    <div class="content"><iframe src="https://classroom6x.org" class="w-full h-48 rounded border"></iframe></div>
+  </div>
+
+  <div id="settings" class="window" style="top:240px;left:60%;">
+    <div class="titlebar">
+      <div>
+        <div class="titlebtn red"></div>
+        <div class="titlebtn yellow inline-block ml-1"></div>
+        <div class="titlebtn green inline-block ml-1"></div>
+      </div>
+      <span>Settings</span>
+      <span class="w-12"></span>
+    </div>
+    <div class="content">
+      <label><input type="checkbox" id="dmToggle" onchange="toggleDark()"/> Enable Dark Mode</label>
+    </div>
   </div>
 
   <script>
-    // Login Mechanism
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-      if (user === "admin" && pass === "1234") {
-        document.getElementById("login-screen").classList.add("hidden");
-        document.getElementById("menuBar").classList.remove("hidden");
-        document.getElementById("dock").classList.remove("hidden");
-      } else {
-        document.getElementById("login-error").classList.remove("hidden");
-      }
+    function doLogin(){
+      if (user.value==="admin" && pass.value==="1234"){
+        login.style.display="none";
+        menubar.classList.remove("hidden");
+        dock.classList.remove("hidden");
+        if(localStorage.dark) document.documentElement.classList.add("dark");
+      } else loginErr.classList.remove("hidden");
     }
-
-    // App Open/Close
-    function openApp(id) {
-      document.getElementById(id).classList.remove("hidden");
+    function openApp(id){
+      document.getElementById(id).style.display="block";
     }
-    function closeApp(id) {
-      document.getElementById(id).classList.add("hidden");
-    }
-
-    // Dark Mode Toggle
-    function toggleDarkMode() {
+    function toggleDark(){
       document.documentElement.classList.toggle("dark");
-      localStorage.setItem("darkMode", document.documentElement.classList.contains("dark"));
+      localStorage.dark = document.documentElement.classList.contains("dark");
     }
-    if (localStorage.getItem("darkMode") === "true") {
-      document.documentElement.classList.add("dark");
-      document.getElementById("darkModeToggle").checked = true;
-    }
-
-    // Live Clock in Menu Bar
-    setInterval(() => {
-      const now = new Date();
-      document.getElementById("menu-time").textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    }, 1000);
+    setInterval(() => time.textContent = new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}), 1000);
   </script>
 </body>
 </html>
