@@ -1,163 +1,117 @@
-// Simple Login
-const credentials = { username: "admin", password: "1234" };
+// Wallpaper
+const wallpapers = [
+  'https://source.unsplash.com/random/1920x1080?nature',
+  'https://source.unsplash.com/random/1920x1080?city',
+  'https://source.unsplash.com/random/1920x1080?space',
+];
+function setRandomWallpaper() {
+  const url = wallpapers[Math.floor(Math.random() * wallpapers.length)];
+  document.getElementById('wallpaper').style.backgroundImage = `url(${url})`;
+}
 
-function login() {
+// Login
+const credentials = { username: "admin", password: "1234" };
+function login(){
   const u = document.getElementById("username").value;
   const p = document.getElementById("password").value;
-  if (u === credentials.username && p === credentials.password) {
-    // Hide the login screen and show the desktop UI
-    document.getElementById("login-screen").style.display = "none";
-    document.getElementById("desktop").style.display = "block";
-  } else {
+  if(u===credentials.username&&p===credentials.password){
+    document.getElementById("login-screen").style.display="none";
+    document.getElementById("desktop").style.display="block";
+    setRandomWallpaper();
+    createDock();
+  } else{
     document.getElementById("login-error").classList.remove("hidden");
   }
 }
 
-// Multi-window support
-let windowCount = 0;
-function createWindow(title, contentHTML) {
-  const win = document.createElement("div");
-  win.className = "absolute top-20 left-20 w-96 h-64 bg-white text-black rounded-xl shadow-lg-custom";
-  win.style.zIndex = 10 + windowCount++;
+// Multi-window helper
+let count=0;
+function createWindow(title, content){
+  const win = document.createElement('div');
+  win.className = 'window';
+  win.style.top = (50 + count*10) + 'px';
+  win.style.left = (50 + count*10) + 'px';
+  win.style.width = '400px';
+  win.style.height = '300px';
+  win.style.zIndex = 100+count;
+  count++;
   win.innerHTML = `
-    <div class="cursor-move bg-gray-200 px-4 py-2 rounded-t-xl flex justify-between items-center">
+    <div class="cursor-move bg-gray-200 px-4 py-2 flex justify-between items-center">
       <span>${title}</span>
-      <button onclick="this.parentElement.parentElement.remove()" class="text-red-500 font-bold">×</button>
+      <button onclick="win.remove()" class="text-red-500 text-xl">×</button>
     </div>
-    <div class="p-2 overflow-auto h-[calc(100%-3rem)]">${contentHTML}</div>
+    <div class="p-2 h-[calc(100%-3rem)] overflow-auto" style="background:white">${content}</div>
   `;
-  makeDraggable(win);
-  document.getElementById("windows").appendChild(win);
+  makeDrag(win);
+  document.getElementById('windows').appendChild(win);
 }
 
-function makeDraggable(el) {
-  const header = el.querySelector(".cursor-move");
-  header.onmousedown = function(e) {
-    let shiftX = e.clientX - el.getBoundingClientRect().left;
-    let shiftY = e.clientY - el.getBoundingClientRect().top;
-    function moveAt(pageX, pageY) {
-      el.style.left = pageX - shiftX + 'px';
-      el.style.top = pageY - shiftY + 'px';
+// Draggable
+function makeDrag(el){
+  const hdr = el.firstElementChild;
+  hdr.onmousedown = e =>{
+    const rect = el.getBoundingClientRect();
+    const offX = e.clientX - rect.left;
+    const offY = e.clientY - rect.top;
+    function move(ev){
+      el.style.left = ev.clientX-offX+'px';
+      el.style.top = ev.clientY-offY+'px';
     }
-    function onMouseMove(e) {
-      moveAt(e.pageX, e.pageY);
-    }
-    document.addEventListener('mousemove', onMouseMove);
-    header.onmouseup = function() {
-      document.removeEventListener('mousemove', onMouseMove);
-      header.onmouseup = null;
-    };
-  };
-  header.ondragstart = () => false;
-}
-
-// File system emulation
-const fileSystem = {
-  "/": ["file1.txt", "project", "notes.md"],
-  "/project": ["index.html", "app.js"]
-};
-function showFileExplorer() {
-  let html = "";
-  for (const dir in fileSystem) {
-    html += "<strong>" + dir + "</strong><ul>";
-    fileSystem[dir].forEach(file => {
-      html += "<li>📄 " + file + "</li>";
-    });
-    html += "</ul>";
-  }
-  createWindow("File Explorer", html);
-}
-
-// Chat system (local simulation)
-function showChatApp() {
-  createWindow("Chat", '<div id="chat-box" class="h-40 overflow-y-auto"></div><input id="chat-input" class="w-full p-1 mt-2 border" placeholder="Type..."><button onclick="sendChat()" class="bg-blue-500 p-1 w-full mt-1 text-white">Send</button>');
-}
-function sendChat() {
-  const input = document.getElementById("chat-input");
-  const box = document.getElementById("chat-box");
-  if (input && input.value) {
-    const msg = document.createElement("div");
-    msg.textContent = "🧑 " + input.value;
-    box.appendChild(msg);
-    input.value = "";
-    box.scrollTop = box.scrollHeight;
-  }
-}
-
-// Voice Assistant (browser speech recognition)
-function showVoiceAssistant() {
-  createWindow("Voice Assistant", '<button onclick="startVoice()" class="bg-green-500 p-2 rounded text-white">🎙️ Start Listening</button><p id="voice-output" class="mt-2"></p>');
-}
-function startVoice() {
-  const recognition = new(window.SpeechRecognition || window.webkitSpeechRecognition)();
-  recognition.lang = 'en-US';
-  recognition.start();
-  recognition.onresult = function(e) {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById("voice-output").textContent = "You said: " + transcript;
+    document.addEventListener('mousemove', move);
+    hdr.onmouseup = () => document.removeEventListener('mousemove',move);
+    hdr.ondragstart=()=>false;
   };
 }
 
-// Tic-Tac-Toe Game
-function showTicTacToe() {
-  createWindow("Tic-Tac-Toe", `
-    <div id="game-board" class="grid grid-cols-3 gap-1 w-24 h-24 mx-auto">
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
-    </div>
-    <button class="w-full bg-red-500 mt-2 text-white py-1 rounded" onclick="resetGame()">Reset Game</button>
-  `);
-}
-let currentPlayer = 'X';
-function playMove(cell) {
-  if (!cell.textContent) {
-    cell.textContent = currentPlayer;
-    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+// Apps:
+function appFiles(){
+  let html='';
+  const fs = {"/":["file1.txt","notes.md"],"/projects":["app.js"]};
+  for(const d in fs){
+    html += `<strong>${d}</strong><ul>${fs[d].map(f=>`<li>📄 ${f}</li>`).join('')}</ul>`;
   }
+  createWindow('Files',html);
 }
-function resetGame() {
-  const cells = document.querySelectorAll("#game-board .box");
-  cells.forEach(cell => cell.textContent = "");
+function appChat(){
+  createWindow('Chat', '<div id="cb" class="h-40 overflow-auto border"></div><input id="ci" class="w-full mt-2 p-1" placeholder="Type"><button onclick="sendChat()" class="bg-blue-500 text-white p-1 w-full mt-1">Send</button>');
+}
+function sendChat(){
+  const i=document.getElementById('ci'),b=document.getElementById('cb');
+  if(i.value){ b.innerHTML+=`<div>🧑 ${i.value}</div>`; i.value=''; b.scrollTop=b.scrollHeight; }
+}
+function appTerm(){
+  createWindow('Terminal','<div id="termOut" class="h-40 overflow-auto bg-black text-green-400 font-mono p-2"></div><input id="termIn" class="w-full p-1 bg-gray-800 text-white font-mono" placeholder="command"><button onclick="execCmd()" class="bg-gray-700 text-white w-full p-1 mt-1">Run</button>');
+}
+function execCmd(){
+  const inpt=document.getElementById('termIn'),out=document.getElementById('termOut');
+  out.innerHTML += `<div>$ ${inpt.value}</div>`;
+  if(inpt.value==='help') out.innerHTML+='<div>Available: help, time</div>';
+  if(inpt.value==='time') out.innerHTML+='<div>'+new Date()+'</div>';
+  inpt.value=''; out.scrollTop=out.scrollHeight;
+}
+function appBrowser(){
+  createWindow('Browser','<iframe src="https://www.example.com" width="100%" height="100%" frameborder="0"></iframe>');
+}
+function appSettings(){
+  createWindow('Settings','<div class="p-4"><button onclick="setRandomWallpaper()" class="bg-blue-500 text-white px-3 py-2 rounded">Change Wallpaper</button></div>');
 }
 
-// Calendar App (Mock)
-function showCalendar() {
-  createWindow("Calendar", `
-    <div class="text-center">
-      <h2 class="text-lg font-bold mb-4">Calendar</h2>
-      <div class="text-sm">January 2025</div>
-      <div class="grid grid-cols-7 gap-1 mt-4">
-        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-        <div class="p-2">1</div><div class="p-2">2</div><div class="p-2">3</div><div class="p-2">4</div><div class="p-2">5</div><div class="p-2">6</div><div class="p-2">7</div>
-        <!-- Continue to fill in the calendar -->
-      </div>
-    </div>
-  `);
-}
-
-// Add apps to the dock
-const dockApps = [
-  { name: "Files", action: showFileExplorer, icon: "📁" },
-  { name: "Chat", action: showChatApp, icon: "💬" },
-  { name: "Voice", action: showVoiceAssistant, icon: "🎤" },
-  { name: "Tic-Tac-Toe", action: showTicTacToe, icon: "⭕" },
-  { name: "Calendar", action: showCalendar, icon: "📅" }
+// Dock
+const dockApps=[
+  {icon:'📁',name:'Files',fn:appFiles},
+  {icon:'💬',name:'Chat',fn:appChat},
+  {icon:'💻',name:'Terminal',fn:appTerm},
+  {icon:'🌐',name:'Browser',fn:appBrowser},
+  {icon:'⚙️',name:'Settings',fn:appSettings},
 ];
-
-// Create Dock Buttons
-window.onload = () => {
-  const dock = document.getElementById("dock");
-  dockApps.forEach(app => {
-    const button = document.createElement("button");
-    button.className = "text-3xl";
-    button.innerHTML = app.icon;
-    button.onclick = () => app.action();
-    dock.appendChild(button);
+function createDock(){
+  const dock=document.getElementById('dock');
+  dock.innerHTML='';
+  dockApps.forEach(a=>{
+    const btn=document.createElement('button');
+    btn.title=a.name;
+    btn.innerText=a.icon;
+    btn.onclick=a.fn;
+    dock.appendChild(btn);
   });
-};
+}
