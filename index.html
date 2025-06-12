@@ -7,13 +7,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600&display=swap');
-    * { box-sizing: border-box; }
+
     body {
       margin: 0;
       font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
       overflow: hidden;
+      background-color: #f0f0f5;
       transition: background-color 0.3s ease-in-out, color 0.3s ease-in-out;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
     }
+
     /* Light and Dark Theme */
     body {
       background-color: #f5f5f5;
@@ -32,6 +38,9 @@
     /* Window styles */
     .window {
       background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
     }
     .dark .window {
       background-color: #333;
@@ -39,22 +48,25 @@
     }
 
     .win-header {
-      background-color: #f0f0f0;
+      background-color: #f0f0f5;
+      display: flex;
+      justify-content: space-between;
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+      border-radius: 12px 12px 0 0;
     }
     .dark .win-header {
       background-color: #444;
+      border-bottom: 1px solid #555;
     }
 
     .window-content {
-      padding: 10px;
+      padding: 20px;
       overflow: auto;
-    }
-    .dark .window-content {
-      background-color: #444;
-      color: #fff;
+      max-height: 400px;
     }
 
-    /* Dock */
+    /* Dock styles (macOS-like dock) */
     #dock {
       position: fixed;
       bottom: 0;
@@ -65,18 +77,22 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      z-index: 10;
+      z-index: 100;
+      border-radius: 10px 10px 0 0;
     }
+
     .dock button {
       background: transparent;
       border: none;
-      font-size: 32px;
+      font-size: 30px;
       color: #fff;
       padding: 15px;
+      margin: 0 10px;
       transition: transform 0.2s;
     }
+
     .dock button:hover {
-      transform: scale(1.2) translateY(-2px);
+      transform: scale(1.1) translateY(-5px);
     }
 
     /* Settings Window */
@@ -93,19 +109,15 @@
       display: none;
       z-index: 9999;
     }
-    .win-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
 
-    /* Menu Bar */
+    /* Menu Bar (macOS-like menu bar) */
     #menuBar {
       position: absolute;
-      top: 0; left: 0; right: 0;
+      top: 0;
+      left: 0;
+      right: 0;
       height: 24px;
-      backdrop-filter: blur(12px);
-      background: rgba(255,255,255,0.2);
+      background: rgba(255, 255, 255, 0.2);
       display: flex;
       align-items: center;
       padding: 0 10px;
@@ -127,6 +139,22 @@
       padding: 10px;
       border-radius: 12px;
       cursor: pointer;
+    }
+
+    /* Window close button (macOS style) */
+    .win-header button {
+      background-color: transparent;
+      border: none;
+      font-size: 18px;
+      color: #999;
+    }
+
+    .win-header button:hover {
+      color: #ff3b30;
+    }
+
+    .win-header button:active {
+      color: #d32f2f;
     }
   </style>
 </head>
