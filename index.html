@@ -17,19 +17,19 @@
     /* Light and Dark Theme */
     body {
       background-color: #f5f5f5;
+      background-image: url('https://source.unsplash.com/collection/928423/1920x1080');
+      background-size: cover;
+      background-position: center;
+      filter: brightness(1);
     }
     .dark body {
       background-color: #1f1f1f;
       color: #fff;
-    }
-
-    #wallpaper {
-      filter: brightness(1);
-    }
-    .dark #wallpaper {
+      background-image: url('https://source.unsplash.com/collection/181581/1920x1080');
       filter: brightness(0.4);
     }
 
+    /* Window styles */
     .window {
       background-color: #fff;
     }
@@ -45,17 +45,61 @@
       background-color: #444;
     }
 
+    .window-content {
+      padding: 10px;
+      overflow: auto;
+    }
+    .dark .window-content {
+      background-color: #444;
+      color: #fff;
+    }
+
+    /* Dock */
+    #dock {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: rgba(0, 0, 0, 0.6);
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
     .dock button {
       background: transparent;
       border: none;
       font-size: 32px;
       color: #fff;
+      padding: 15px;
       transition: transform 0.2s;
     }
-    .dark .dock button:hover {
+    .dock button:hover {
       transform: scale(1.2) translateY(-2px);
     }
 
+    /* Settings Window */
+    #settings-window {
+      position: absolute;
+      top: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      display: none;
+      z-index: 9999;
+    }
+    .win-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Menu Bar */
     #menuBar {
       position: absolute;
       top: 0; left: 0; right: 0;
@@ -69,22 +113,11 @@
       color: #fff;
       z-index: 200;
     }
-
     .dark #menuBar {
       background: rgba(50, 50, 50, 0.7);
     }
 
-    .window-content {
-      flex: 1;
-      padding: 10px;
-      overflow: auto;
-    }
-
-    .dark .window-content {
-      background-color: #444;
-      color: #fff;
-    }
-
+    /* Settings Button */
     #settings-btn {
       position: fixed;
       top: 20px;
@@ -121,7 +154,7 @@
 </div>
 
 <!-- Settings App -->
-<div id="settings-window" class="window" style="display: none; z-index: 9999;">
+<div id="settings-window" class="window">
   <div class="win-header">
     <h2 class="text-xl">Settings</h2>
     <button onclick="closeSettings()">✖️</button>
@@ -134,20 +167,8 @@
 </div>
 
 <script>
-  const wallpapers = [
-    'https://source.unsplash.com/collection/928423/1920x1080',
-    'https://source.unsplash.com/collection/181581/1920x1080',
-    'https://wallpapercave.com/wp/wp5128415.jpg'
-  ];
   const cred = { username: 'admin', password: '1234' };
-  let z = 100, count = 0;
-
-  // Set the wallpaper
-  function setWallpaper() {
-    document.getElementById('wallpaper').style.backgroundImage =
-      `url(${wallpapers[Math.floor(Math.random() * wallpapers.length)]})`;
-  }
-
+  
   // Login function
   function login() {
     const u = document.getElementById('username').value;
@@ -163,6 +184,11 @@
     }
   }
 
+  // Set Wallpaper
+  function setWallpaper() {
+    document.body.style.backgroundImage = `url('https://source.unsplash.com/collection/928423/1920x1080')`;
+  }
+
   // Toggle Dark Mode
   function toggleTheme() {
     const body = document.body;
@@ -171,7 +197,7 @@
     showNotification(body.classList.contains('dark') ? "Dark Mode enabled" : "Light Mode enabled");
   }
 
-  // Load the theme from local storage
+  // Load Theme from Local Storage
   function loadTheme() {
     const savedTheme = localStorage.getItem('darkMode');
     if (savedTheme === 'true') {
@@ -182,9 +208,6 @@
       document.getElementById('dark-mode-toggle').checked = false;
     }
   }
-
-  // Call the function to load the theme when the page loads
-  loadTheme();
 
   // Show notifications
   function showNotification(text) {
@@ -205,7 +228,7 @@
     setTimeout(() => note.remove(), 4000);
   }
 
-  // Initialize the Dock with apps
+  // Initialize Dock with apps
   function initDock() {
     const apps = [
       ['📝', 'Notes', () => openApp('Notes')],
@@ -246,6 +269,9 @@
   function startAssistant() {
     alert("Starting XenzAssist...");
   }
+
+  // Call the function to load the theme when the page loads
+  loadTheme();
 </script>
 
 </body>
