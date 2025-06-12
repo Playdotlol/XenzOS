@@ -14,15 +14,15 @@ function login() {
 let windowCount = 0;
 function createWindow(title, contentHTML) {
   const win = document.createElement("div");
-  win.className = "absolute top-20 left-20 w-96 h-64 bg-white text-black rounded-xl shadow-lg";
+  win.className = "absolute top-20 left-20 w-96 h-64 bg-white text-black rounded-xl shadow-lg-custom";
   win.style.zIndex = 10 + windowCount++;
-  win.innerHTML = \`
+  win.innerHTML = `
     <div class="cursor-move bg-gray-200 px-4 py-2 rounded-t-xl flex justify-between items-center">
-      <span>\${title}</span>
+      <span>${title}</span>
       <button onclick="this.parentElement.parentElement.remove()" class="text-red-500 font-bold">×</button>
     </div>
-    <div class="p-2 overflow-auto h-[calc(100%-3rem)]">\${contentHTML}</div>
-  \`;
+    <div class="p-2 overflow-auto h-[calc(100%-3rem)]">${contentHTML}</div>
+  `;
   makeDraggable(win);
   document.getElementById("windows").appendChild(win);
 }
@@ -95,18 +95,63 @@ function startVoice() {
   };
 }
 
+// Tic-Tac-Toe Game
+function showTicTacToe() {
+  createWindow("Tic-Tac-Toe", `
+    <div id="game-board" class="grid grid-cols-3 gap-1 w-24 h-24 mx-auto">
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+      <div class="box h-full w-full bg-gray-200 cursor-pointer text-center text-2xl" onclick="playMove(this)"></div>
+    </div>
+    <button class="w-full bg-red-500 mt-2 text-white py-1 rounded" onclick="resetGame()">Reset Game</button>
+  `);
+}
+let currentPlayer = 'X';
+function playMove(cell) {
+  if (!cell.textContent) {
+    cell.textContent = currentPlayer;
+    currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+  }
+}
+function resetGame() {
+  const cells = document.querySelectorAll("#game-board .box");
+  cells.forEach(cell => cell.textContent = "");
+}
+
+// Calendar App (Mock)
+function showCalendar() {
+  createWindow("Calendar", `
+    <div class="text-center">
+      <h2 class="text-lg font-bold mb-4">Calendar</h2>
+      <div class="text-sm">January 2025</div>
+      <div class="grid grid-cols-7 gap-1 mt-4">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+        <div class="p-2">1</div><div class="p-2">2</div><div class="p-2">3</div><div class="p-2">4</div><div class="p-2">5</div><div class="p-2">6</div><div class="p-2">7</div>
+        <!-- Continue to fill in the calendar -->
+      </div>
+    </div>
+  `);
+}
+
 // Taskbar buttons
 window.onload = () => {
   const apps = [
     { name: "Files", action: showFileExplorer },
     { name: "Chat", action: showChatApp },
-    { name: "Voice", action: showVoiceAssistant }
+    { name: "Voice", action: showVoiceAssistant },
+    { name: "Tic-Tac-Toe", action: showTicTacToe },
+    { name: "Calendar", action: showCalendar }
   ];
   const taskbar = document.getElementById("taskbar");
   apps.forEach(app => {
     const btn = document.createElement("button");
     btn.textContent = app.name;
-    btn.className = "bg-gray-700 hover:bg-gray-600 text-white px-4 py-1 rounded";
+    btn.className = "bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded";
     btn.onclick = app.action;
     taskbar.appendChild(btn);
   });
